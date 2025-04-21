@@ -101,7 +101,16 @@ void netshaper_release_queued_packets(struct work_struct *work)
 
 			/* Re-inject the packet */
 			spin_unlock_irqrestore(&netshaper_cg->lock, flags);
-			qskb->okfn(qskb->dev, qskb->skb);
+			
+			/* Safety check for callback function */
+			if (qskb->okfn && qskb->skb && qskb->dev) {
+				qskb->okfn(qskb->dev, qskb->skb);
+			} else {
+				/* If callback is invalid, free the skb ourselves */
+				if (qskb->skb)
+					kfree_skb(qskb->skb);
+			}
+			
 			spin_lock_irqsave(&netshaper_cg->lock, flags);
 
 			atomic64_dec(&netshaper_cg->delayed_packets);

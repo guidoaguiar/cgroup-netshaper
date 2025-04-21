@@ -25,6 +25,13 @@ static unsigned int check_interval = NETSHAPER_CHECK_INTERVAL_MS;
 module_param(check_interval, uint, 0644);
 MODULE_PARM_DESC(check_interval, "Packet release check interval in milliseconds (default: 100ms)");
 
+/* Forward declarations for cgroup file operations */
+extern u64 netshaper_rate_read(struct cgroup_subsys_state *css, struct cftype *cft);
+extern int netshaper_rate_write(struct cgroup_subsys_state *css, struct cftype *cft, u64 val);
+extern u64 netshaper_burst_read(struct cgroup_subsys_state *css, struct cftype *cft);
+extern int netshaper_burst_write(struct cgroup_subsys_state *css, struct cftype *cft, u64 val);
+extern int netshaper_stats_show(struct seq_file *sf, void *v);
+
 /* Helper to get our cgroup state from a css */
 struct netshaper_cgroup *css_netshaper(struct cgroup_subsys_state *css)
 {

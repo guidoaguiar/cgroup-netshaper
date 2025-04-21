@@ -20,6 +20,7 @@
 #include <linux/version.h>
 #include <net/sock.h>
 #include <linux/init.h>
+#include <linux/seq_file.h>
 
 /* Compatibility macros for different kernel versions */
 #ifndef HAS_NET_HOOKS
@@ -33,6 +34,22 @@
   #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 13, 0)
     #define sock_gen_put(sk) sock_put(sk)
   #endif
+#endif
+
+/* For kernels that don't have seq_css() function */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
+  static inline struct cgroup_subsys_state *seq_css(struct seq_file *sf)
+  {
+    return (struct cgroup_subsys_state *)sf->private;
+  }
+#endif
+
+/* For kernels that don't have to_delayed_work() helper */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 13, 0)
+  static inline struct delayed_work *to_delayed_work(struct work_struct *work)
+  {
+    return container_of(work, struct delayed_work, work);
+  }
 #endif
 
 /* Module Information */
@@ -92,5 +109,15 @@ void netshaper_unregister_netfilter(void);
 /* Helper functions */
 struct netshaper_cgroup *css_netshaper(struct cgroup_subsys_state *css);
 void netshaper_release_queued_packets(struct work_struct *work);
+
+/* Cgroup controller file operations */
+u64 netshaper_rate_read(struct cgroup_subsys_state *css, struct cftype *cft);
+int netshaper_rate_write(struct cgroup_subsys_state *css, struct cftype *cft, u64 val);
+u64 netshaper_burst_read(struct cgroup_subsys_state *css, struct cftype *cft);
+int netshaper_burst_write(struct cgroup_subsys_state *css, struct cftype *cft, u64 val);
+int netshaper_stats_show(struct seq_file *sf, void *v);
+
+/* Global variables */
+extern struct cgroup_subsys net_shaper_cgrp_subsys;
 
 #endif /* _NETSHAPER_H */
