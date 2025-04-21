@@ -90,6 +90,8 @@ jobs:
               : "❌ Kernel module tests failed with kernel ${{ matrix.kernel-version }}";
               
             github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
               name: 'kernel-module-test-${{ matrix.kernel-version }}',
               head_sha: context.sha,
               status: 'completed',

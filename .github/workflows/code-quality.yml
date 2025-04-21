@@ -51,6 +51,8 @@ jobs:
         with:
           script: |
             github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
               name: 'linux-kernel-checkpatch',
               head_sha: context.sha,
               status: 'completed',
@@ -95,6 +97,8 @@ jobs:
         with:
           script: |
             github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
               name: 'static-analysis',
               head_sha: context.sha,
               status: 'completed',
@@ -144,6 +148,8 @@ jobs:
         with:
           script: |
             github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
               name: 'kernel-coding-style',
               head_sha: context.sha,
               status: 'completed',
