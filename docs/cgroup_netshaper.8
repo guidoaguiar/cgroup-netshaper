@@ -1,0 +1,76 @@
+.TH CGROUP_NETSHAPER 8 "April 2025" "Version 0.1.0" "System Administration"
+
+.SH NAME
+cgroup_netshaper \- Network bandwidth shaping for control groups
+
+.SH SYNOPSIS
+.B insmod
+.I cgroup_netshaper.ko
+.br
+.B modprobe
+.I cgroup_netshaper
+
+.SH DESCRIPTION
+.B cgroup_netshaper
+is a Linux kernel module that implements network rate limiting for cgroups.
+It integrates with the cgroup v2 hierarchy to provide per-cgroup network
+bandwidth limits without requiring complex tc/iptables configuration.
+
+.SH USAGE
+The module creates the following control files in each cgroup directory:
+
+.TP
+.B cgroup.net_shaper.rate
+Controls the maximum bandwidth rate in bytes per second.
+
+.TP
+.B cgroup.net_shaper.burst
+Controls the allowed burst size in bytes.
+
+.TP
+.B cgroup.net_shaper.stats
+Displays statistics about the cgroup's network usage.
+
+.SH EXAMPLES
+.PP
+To limit a process to 1 MB/s bandwidth:
+
+.RS
+.nf
+# Load the module
+sudo insmod cgroup_netshaper.ko
+
+# Create a cgroup
+mkdir -p /sys/fs/cgroup/limited
+
+# Set limits (1MB/s with 100KB burst)
+echo 1048576 > /sys/fs/cgroup/limited/cgroup.net_shaper.rate
+echo 102400 > /sys/fs/cgroup/limited/cgroup.net_shaper.burst
+
+# Move a process into the cgroup
+echo $PID > /sys/fs/cgroup/limited/cgroup.procs
+.fi
+.RE
+
+.SH FILES
+.TP
+.I /sys/fs/cgroup/*/cgroup.net_shaper.rate
+Per-cgroup bandwidth rate setting.
+
+.TP
+.I /sys/fs/cgroup/*/cgroup.net_shaper.burst
+Per-cgroup burst size setting.
+
+.TP
+.I /sys/fs/cgroup/*/cgroup.net_shaper.stats
+Per-cgroup statistics.
+
+.SH SEE ALSO
+.BR cgroups (7),
+.BR systemd.resource-control (5)
+
+.SH BUGS
+Please report bugs at https://github.com/yourusername/cgroup-netshaper/issues
+
+.SH AUTHOR
+cgroup-netshaper Contributors
